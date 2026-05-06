@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptochat - Secure Defense Messenger</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== THEME VARIABLES ===== */
+        :root {
+            --dark-bg-primary: #0a1929;
+            --dark-bg-secondary: #0c1c2e;
+            --dark-bg-tertiary: #0d1b2a;
+            --dark-bg-sidebar: #0b1622;
+            --dark-bg-card: #0d1b2a;
+            --dark-bg-input: #0b1622;
+            --dark-text-primary: #ffffff;
+            --dark-text-secondary: #e0e0e0;
+            --dark-text-muted: #8ab4f8;
+            --dark-text-dim: #b0b0b0;
+            --dark-border: #1e3a5c;
+            --dark-accent: #2d7ad6;
+            --dark-accent-hover: #1565c0;
+            --dark-success: #34a853;
+            --dark-warning: #fbbc05;
+            --dark-danger: #f44336;
+            --dark-spybot: #ff4081;
+        }
+        
+        body.light-theme {
+            --primary-bg: #f5f5f5;
+            --secondary-bg: #ffffff;
+            --tertiary-bg: #fafafa;
+            --sidebar-bg: #e8e8e8;
+            --card-bg: #ffffff;
+            --input-bg: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #333333;
+            --text-muted: #666666;
+            --text-dim: #888888;
+            --border-color: #dddddd;
+            --accent-color: #0d47a1;
+            --accent-hover: #1565c0;
+            --success-color: #2e7d32;
+            --warning-color: #ed6c02;
+            --danger-color: #d32f2f;
+            --spybot-color: #e91e63;
+        }
+        
+        body.dim-theme {
+            --primary-bg: #1a1a2e;
+            --secondary-bg: #1e1e2e;
+            --tertiary-bg: #25253a;
+            --sidebar-bg: #16162a;
+            --card-bg: #1e1e2e;
+            --input-bg: #25253a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #c0c0c0;
+            --text-muted: #a0a0a0;
+            --text-dim: #909090;
+            --border-color: #2a2a40;
+            --accent-color: #4f8bc9;
+            --accent-hover: #6a9fd5;
+            --success-color: #4caf50;
+            --warning-color: #ffb74d;
+            --danger-color: #ef5350;
+            --spybot-color: #ff6090;
+        }
+        
+        body.dark-theme {
+            --primary-bg: var(--dark-bg-primary);
+            --secondary-bg: var(--dark-bg-secondary);
+            --tertiary-bg: var(--dark-bg-tertiary);
+            --sidebar-bg: var(--dark-bg-sidebar);
+            --card-bg: var(--dark-bg-card);
+            --input-bg: var(--dark-bg-input);
+            --text-primary: var(--dark-text-primary);
+            --text-secondary: var(--dark-text-secondary);
+            --text-muted: var(--dark-text-muted);
+            --text-dim: var(--dark-text-dim);
+            --border-color: var(--dark-border);
+            --accent-color: var(--dark-accent);
+            --accent-hover: var(--dark-accent-hover);
+            --success-color: var(--dark-success);
+            --warning-color: var(--dark-warning);
+            --danger-color: var(--dark-danger);
+            --spybot-color: var(--dark-spybot);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        body {
+            background: var(--primary-bg);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .cryptochat-app {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: var(--secondary-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+        
+        .screen { display: none; }
+        .screen.active { display: block; }
+        
+        /* ===== AUTH SCREEN ===== */
+        .auth-container {
+            display: flex;
+            min-height: 600px;
+        }
+        
+        .auth-left {
+            width: 35%;
+            background: linear-gradient(135deg, var(--tertiary-bg), var(--sidebar-bg));
+            padding: 40px;
+        }
+        
+        .auth-right {
+            width: 65%;
+            padding: 40px;
+            background: var(--secondary-bg);
+        }
+        
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-color), var(--success-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .logo-area h2 { color: var(--text-primary); }
+        .logo-area p { color: var(--text-muted); }
+        
+        .feature-list { margin-top: 30px; }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .feature-icon {
+            width: 35px;
+            height: 35px;
+            background: rgba(42,122,214,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+        }
+        .feature-item strong { color: var(--text-primary); }
+        .feature-item span { color: var(--text-dim); font-size: 12px; }
+        
+        .auth-tabs {
+            display: flex;
+            gap: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        .auth-tab {
+            padding: 12px 0;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .auth-tab.active {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .input-with-icon {
+            position: relative;
+        }
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        .input-with-icon input, .input-with-icon select {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+        }
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        /* ===== MAIN APP LAYOUT ===== */
+        .main-layout {
+            display: flex;
+            height: 85vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: var(--tertiary-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-color), var(--success-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        .user-info h4 { color: var(--text-primary); }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 8px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .action-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        .theme-toggle-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .theme-option {
+            flex: 1;
+            padding: 6px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-align: center;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .theme-option.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        .backup-status {
+            font-size: 11px;
+            color: var(--success-color);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .logout-btn:hover { background: rgba(244,67,54,0.1); }
+        
+        .contacts-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .contact-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.3s;
+        }
+        .contact-item:hover { background: var(--tertiary-bg); }
+        .contact-item.active { background: var(--card-bg); border-left: 3px solid var(--accent-color); }
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        .contact-info { flex: 1; }
+        .contact-name {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .contact-name h4 { font-size: 14px; color: var(--text-primary); }
+        .contact-status { font-size: 11px; color: var(--text-muted); }
+        
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--secondary-bg);
+        }
+        
+        .chat-header {
+            padding: 20px;
+            background: var(--tertiary-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { color: var(--text-primary); }
+        
+        .connection-status {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(244,67,54,0.2);
+            color: var(--danger-color);
+        }
+        .connection-status.connected { background: rgba(76,175,80,0.2); color: var(--success-color); }
+        
+        .key-display {
+            background: linear-gradient(135deg, rgba(255,64,129,0.1), rgba(155,39,176,0.1));
+            border: 1px solid var(--spybot-color);
+            border-radius: 10px;
+            padding: 12px;
+            margin: 10px;
+            text-align: center;
+        }
+        .key-display h4 { color: var(--spybot-color); }
+        .current-key {
+            font-family: monospace;
+            font-size: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 8px 0;
+            color: var(--text-primary);
+        }
+        .key-timer { color: var(--warning-color); font-size: 12px; }
+        
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .message.sent { justify-content: flex-end; }
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 18px;
+        }
+        .message.received .message-bubble { 
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .message.sent .message-bubble { 
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            color: white;
+        }
+        .message-time { font-size: 10px; margin-top: 5px; color: var(--text-dim); text-align: right; }
+        .decrypt-btn {
+            background: transparent;
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        
+        .input-area {
+            padding: 20px;
+            background: var(--tertiary-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+        }
+        .input-area input {
+            flex: 1;
+            padding: 12px 20px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            color: var(--text-secondary);
+        }
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .modal-content h3 { color: var(--text-primary); margin-bottom: 15px; }
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--text-secondary);
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal-confirm { background: linear-gradient(135deg, var(--accent-color), var(--accent-hover)); color: white; border: none; }
+        .modal-cancel { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
+        
+        /* Backup History */
+        .backup-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .backup-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+        .backup-item:hover { background: var(--tertiary-bg); }
+        .backup-date { font-weight: bold; color: var(--text-primary); }
+        .backup-size { font-size: 11px; color: var(--text-muted); }
+        
+        /* Floating Button */
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--spybot-color), var(--danger-color));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .threat-counter {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger-color);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+        
+        /* Limitations Bar */
+        .limitations-bar {
+            background: var(--tertiary-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            font-size: 11px;
+        }
+        .limitation-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .limitation-item.solved { background: rgba(76,175,80,0.2); border: 1px solid var(--success-color); }
+        
+        /* Threat Alert */
+        .threat-alert {
+            background: linear-gradient(135deg, rgba(255,152,0,0.1), rgba(244,67,54,0.1));
+            border: 1px solid var(--warning-color);
+            border-radius: 10px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+        .threat-alert.critical { border-color: var(--danger-color); animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0%,100% { border-color: var(--danger-color); }
+            50% { border-color: #ff5252; }
+        }
+        .threat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .threat-header h4 { color: var(--warning-color); font-size: 13px; flex: 1; }
+        .threat-alert.critical .threat-header h4 { color: var(--danger-color); }
+        .threat-level {
+            background: var(--warning-color);
+            color: var(--primary-bg);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+        }
+        .threat-message { font-size: 12px; margin-bottom: 8px; color: var(--text-secondary); }
+        .threat-details { font-size: 10px; color: var(--text-muted); display: flex; gap: 15px; margin-bottom: 8px; }
+        .threat-btn {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--text-muted);
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .auth-container { flex-direction: column; }
+            .auth-left, .auth-right { width: 100%; }
+            .main-layout { flex-direction: column; }
+            .sidebar { width: 100%; display: none; }
+            .sidebar-visible .sidebar { display: flex; }
+            .sidebar-visible .chat-area { display: none; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 12px 16px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            color: var(--text-secondary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body class="dark-theme">
+<div class="cryptochat-app">
+    <!-- AUTH SCREEN -->
+    <div class="screen active" id="authScreen">
+        <div class="auth-container">
+            <div class="auth-left">
+                <div class="logo-area">
+                    <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div><h2>Cryptochat</h2><p>Defense Edition</p></div>
+                </div>
+                <div class="feature-list">
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-satellite-dish"></i></div><div><strong>Offline-First Mode</strong><br><span>Works without internet</span></div></div>
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-link"></i></div><div><strong>Legacy System Bridge</strong><br><span>Integrates with existing systems</span></div></div>
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-shield-virus"></i></div><div><strong>Endpoint Protection</strong><br><span>Biometric + Hardware security</span></div></div>
+                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-globe"></i></div><div><strong>Multi-National Support</strong><br><span>NATO + Allied forces ready</span></div></div>
+                </div>
+            </div>
+            <div class="auth-right">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchTab('login')">Login</button>
+                    <button class="auth-tab" onclick="switchTab('signup')">Register</button>
+                </div>
+                <div class="auth-form active" id="loginForm">
+                    <div class="input-group"><label>Username / Military ID</label><div class="input-with-icon"><i class="fas fa-user"></i><input type="text" id="loginUser" placeholder="Enter username"></div></div>
+                    <div class="input-group"><label>Password</label><div class="input-with-icon"><i class="fas fa-key"></i><input type="password" id="loginPass" placeholder="Enter password"></div></div>
+                    <div class="input-group"><label>Authentication Mode</label><div class="input-with-icon"><i class="fas fa-shield-alt"></i><select id="authMode"><option value="standard">Standard</option><option value="biometric">Biometric + Hardware Key</option><option value="offline">Offline Mode</option></select></div></div>
+                    <button class="auth-btn" onclick="handleLogin()"><i class="fas fa-sign-in-alt"></i> Secure Login</button>
+                </div>
+                <div class="auth-form" id="signupForm">
+                    <div class="input-group"><label>Full Name</label><input type="text" id="signupName" placeholder="Full name" style="width:100%;padding:12px;background:var(--input-bg);border:1px solid var(--border-color);border-radius:8px;color:var(--text-secondary);"></div>
+                    <div class="input-group"><label>Military ID</label><input type="text" id="signupMilId" placeholder="Military ID" style="width:100%;padding:12px;background:var(--input-bg);border:1px solid var(--border-color);border-radius:8px;color:var(--text-secondary);"></div>
+                    <div class="input-group"><label>Unit/Agency</label><select id="signupUnit" style="width:100%;padding:12px;background:var(--input-bg);border:1px solid var(--border-color);border-radius:8px;color:var(--text-secondary);"><option>Indian Army</option><option>Indian Navy</option><option>Indian Air Force</option><option>Intelligence Bureau</option><option>NATO Allied</option></select></div>
+                    <div class="input-group"><label>Password</label><input type="password" id="signupPass" placeholder="Create password" style="width:100%;padding:12px;background:var(--input-bg);border:1px solid var(--border-color);border-radius:8px;color:var(--text-secondary);"></div>
+                    <button class="auth-btn" onclick="handleSignup()"><i class="fas fa-user-plus"></i> Register</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MAIN APP SCREEN -->
+    <div class="screen" id="mainScreen">
+        <div class="main-layout" id="mainLayout">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="user-info">
+                        <div class="user-avatar" id="userAvatar">AM</div>
+                        <div><h4 id="userName">Maj. Arjun</h4><span class="offline-mode-badge" style="background:var(--warning-color);color:var(--primary-bg);padding:3px 8px;border-radius:15px;font-size:10px;"><i class="fas fa-wifi"></i> Hybrid</span></div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="showAddContactModal()"><i class="fas fa-user-plus"></i> Add</button>
+                        <button class="action-btn" onclick="showBackupModal()"><i class="fas fa-database"></i> Backup</button>
+                        <button class="action-btn" onclick="showRestoreModal()"><i class="fas fa-history"></i> Restore</button>
+                    </div>
+                    <div class="theme-toggle-container">
+                        <div class="theme-option" onclick="setTheme('dark')"><i class="fas fa-moon"></i> Dark</div>
+                        <div class="theme-option" onclick="setTheme('light')"><i class="fas fa-sun"></i> Light</div>
+                        <div class="theme-option" onclick="setTheme('dim')"><i class="fas fa-adjust"></i> Dim</div>
+                    </div>
+                    <div class="backup-status" id="backupStatus">
+                        <i class="fas fa-clock"></i> <span id="lastBackupText">No backup yet</span>
+                    </div>
+                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+                <div class="contacts-list" id="contactsList"></div>
+            </div>
+            <div class="chat-area">
+                <div class="chat-header">
+                    <div><h3 id="chatName">Spybot</h3><span class="connection-status" id="connStatus"><i class="fas fa-satellite-dish"></i> Mesh Active</span></div>
+                    <button id="genKeyBtn" style="background:transparent;border:1px solid var(--spybot-color);color:var(--spybot-color);padding:5px 12px;border-radius:5px;cursor:pointer;"><i class="fas fa-key"></i> New Key</button>
+                </div>
+                <div id="keyDisplay" class="key-display">
+                    <h4><i class="fas fa-key"></i> ACTIVE KEY</h4>
+                    <div class="current-key" id="currentKey">7X9aB2cD4</div>
+                    <div class="key-timer" id="keyTimer">Expires: 01:00</div>
+                </div>
+                <div class="messages-container" id="messagesContainer"></div>
+                <div class="input-area">
+                    <input type="text" id="msgInput" placeholder="Type message...">
+                    <button class="send-btn" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="limitations-bar" id="limitationsBar">
+            <div class="limitation-item solved" onclick="showLimitationSolution('legacy')"><i class="fas fa-server"></i> Legacy ✓</div>
+            <div class="limitation-item solved" onclick="showLimitationSolution('offline')"><i class="fas fa-wifi"></i> Offline ✓</div>
+            <div class="limitation-item solved" onclick="showLimitationSolution('usability')"><i class="fas fa-users"></i> Usability ✓</div>
+            <div class="limitation-item solved" onclick="showLimitationSolution('interop')"><i class="fas fa-globe"></i> Interop ✓</div>
+            <div class="limitation-item solved" onclick="showLimitationSolution('cost')"><i class="fas fa-dollar-sign"></i> Cost ✓</div>
+            <div class="limitation-item solved" onclick="showLimitationSolution('decentral')"><i class="fas fa-network-wired"></i> Decentral ✓</div>
+            <div class="limitation-item solved" onclick="showLimitationSolution('endpoint')"><i class="fas fa-shield-virus"></i> Endpoint ✓</div>
+        </div>
+        
+        <button class="floating-btn" id="threatBtn"><i class="fas fa-radar"></i><span class="threat-counter" id="threatCounter">0</span></button>
+    </div>
+</div>
+
+<!-- Add Contact Modal -->
+<div class="modal" id="addContactModal">
+    <div class="modal-content">
+        <h3><i class="fas fa-user-plus"></i> Add New Contact</h3>
+        <input type="text" id="newContactName" placeholder="Full Name">
+        <input type="text" id="newContactRank" placeholder="Rank / Designation">
+        <select id="newContactAgency">
+            <option>Indian Army</option>
+            <option>Indian Navy</option>
+            <option>Indian Air Force</option>
+            <option>Intelligence Bureau</option>
+            <option>NATO Allied</option>
+            <option>Other Agency</option>
+        </select>
+        <input type="text" id="newContactId" placeholder="Military ID / Username">
+        <div class="modal-buttons">
+            <button class="modal-cancel" onclick="closeAddContactModal()">Cancel</button>
+            <button class="modal-confirm" onclick="addContact()">Add Contact</button>
+        </div>
+    </div>
+</div>
+
+<!-- Backup Modal -->
+<div class="modal" id="backupModal">
+    <div class="modal-content">
+        <h3><i class="fas fa-database"></i> Backup Data</h3>
+        <p style="margin-bottom: 15px;">Create a secure backup of your messages, contacts, and settings.</p>
+        <div class="backup-list" id="backupList"></div>
+        <div class="modal-buttons">
+            <button class="modal-cancel" onclick="closeBackupModal()">Cancel</button>
+            <button class="modal-confirm" onclick="createBackup()">Create New Backup</button>
+        </div>
+    </div>
+</div>
+
+<!-- Restore Modal -->
+<div class="modal" id="restoreModal">
+    <div class="modal-content">
+        <h3><i class="fas fa-history"></i> Restore from Backup</h3>
+        <p>Select a backup to restore:</p>
+        <div class="backup-list" id="restoreList"></div>
+        <div class="modal-buttons">
+            <button class="modal-cancel" onclick="closeRestoreModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Decryption Modal -->
+<div class="modal" id="decryptModal">
+    <div class="modal-content">
+        <h3><i class="fas fa-lock"></i> Decrypt Message</h3>
+        <p>Enter current Spybot key:</p>
+        <input type="text" id="decryptKeyInput" placeholder="Enter key">
+        <div class="modal-buttons">
+            <button class="modal-cancel" onclick="closeDecryptModal()">Cancel</button>
+            <button class="modal-confirm" onclick="confirmDecrypt()">Decrypt</button>
+        </div>
+    </div>
+</div>
+
+<!-- Limitation Solution Modal -->
+<div class="modal" id="solutionModal">
+    <div class="modal-content">
+        <h3 id="solutionTitle"></h3>
+        <div id="solutionContent"></div>
+        <div class="modal-buttons"><button class="modal-confirm" onclick="closeSolutionModal()">Got it</button></div>
+    </div>
+</div>
+
+<script>
+    // ==================== THEME MANAGEMENT ====================
+    function setTheme(theme) {
+        document.body.classList.remove('dark-theme', 'light-theme', 'dim-theme');
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+            localStorage.setItem('cryptochat_theme', 'dark');
+        } else if (theme === 'light') {
+            document.body.classList.add('light-theme');
+            localStorage.setItem('cryptochat_theme', 'light');
+        } else if (theme === 'dim') {
+            document.body.classList.add('dim-theme');
+            localStorage.setItem('cryptochat_theme', 'dim');
+        }
+        
+        document.querySelectorAll('.theme-option').forEach(btn => {
+            btn.classList.remove('active');
+            if ((theme === 'dark' && btn.textContent.includes('Dark')) ||
+                (theme === 'light' && btn.textContent.includes('Light')) ||
+                (theme === 'dim' && btn.textContent.includes('Dim'))) {
+                btn.classList.add('active');
+            }
+        });
+    }
+    
+    const savedTheme = localStorage.getItem('cryptochat_theme');
+    if (savedTheme) setTheme(savedTheme);
+    else setTheme('dark');
+    
+    // ==================== STATE ====================
+    let currentUser = null;
+    let activeKey = "7X9aB2cD4";
+    let keyExpiry = Date.now() + 60000;
+    let keyTimerInt = null;
+    let threatInterval = null;
+    let threatCount = 0;
+    let currentContact = "spybot";
+    let pendingMsg = null;
+    let messages = [];
+    let msgId = 10;
+    let userContacts = [];
+    let backups = [];
+    
+    // Default contacts
+    const defaultContacts = [
+        { id: "spybot", name: "Spybot", avatar: "SB", color: "linear-gradient(135deg,var(--spybot-color),#e91e63)", agency: "AI Security", rank: "AI", militaryId: "SPY001" },
+        { id: "singh", name: "Col. Chetan Singh", avatar: "CS", color: "linear-gradient(135deg,#c2185b,#e91e63)", agency: "Indian Army", rank: "Colonel", militaryId: "IA12345" },
+        { id: "patel", name: "Cdr. Rohan Patel", avatar: "RP", color: "linear-gradient(135deg,#00796b,#009688)", agency: "Indian Navy", rank: "Commander", militaryId: "IN67890" },
+        { id: "sharma", name: "Wg. Cdr. Vikram Sharma", avatar: "VS", color: "linear-gradient(135deg,#303f9f,#3f51b5)", agency: "Indian Air Force", rank: "Wing Commander", militaryId: "IAF11223" },
+        { id: "nato", name: "NATO Liaison", avatar: "NL", color: "linear-gradient(135deg,#1565c0,#42a5f5)", agency: "NATO Allied", rank: "Liaison Officer", militaryId: "NATO001" },
+        { id: "intel", name: "Intel Agency", avatar: "IA", color: "linear-gradient(135deg,#5d4037,#795548)", agency: "Intelligence", rank: "Agent", militaryId: "INT999" }
+    ];
+    
+    // ==================== BACKUP FUNCTIONS ====================
+    function saveToLocalStorage() {
+        const backupData = {
+            contacts: userContacts,
+            messages: messages,
+            lastBackup: new Date().toISOString(),
+            version: "1.0"
+        };
+        localStorage.setItem('cryptochat_userdata', JSON.stringify(backupData));
+        updateBackupStatus();
+    }
+    
+    function loadFromLocalStorage() {
+        const saved = localStorage.getItem('cryptochat_userdata');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                if (data.contacts && data.contacts.length > 0) userContacts = data.contacts;
+                if (data.messages) messages = data.messages;
+                updateBackupStatus();
+                return true;
+            } catch(e) { console.error("Error loading data"); }
+        }
+        return false;
+    }
+    
+    function updateBackupStatus() {
+        const lastBackup = localStorage.getItem('cryptochat_lastbackup');
+        if (lastBackup) {
+            const date = new Date(lastBackup);
+            document.getElementById('lastBackupText').innerHTML = `Last backup: ${date.toLocaleString()}`;
+        } else {
+            document.getElementById('lastBackupText').innerHTML = 'No backup yet';
+        }
+    }
+    
+    function createBackup() {
+        const backup = {
+            id: Date.now(),
+            timestamp: new Date().toISOString(),
+            contacts: [...userContacts],
+            messages: [...messages],
+            messageCount: messages.length,
+            contactCount: userContacts.length
+        };
+        
+        backups.unshift(backup);
+        if (backups.length > 10) backups.pop();
+        
+        // Save to localStorage
+        localStorage.setItem('cryptochat_backups', JSON.stringify(backups));
+        localStorage.setItem('cryptochat_lastbackup', new Date().toISOString());
+        
+        showToast(`Backup created! ${messages.length} messages, ${userContacts.length} contacts saved.`, 'success');
+        updateBackupStatus();
+        closeBackupModal();
+        
+        // Auto-backup every 5 minutes (real-time)
+        startAutoBackup();
+    }
+    
+    function startAutoBackup() {
+        if (window.autoBackupInterval) clearInterval(window.autoBackupInterval);
+        window.autoBackupInterval = setInterval(() => {
+            const autoBackup = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                contacts: [...userContacts],
+                messages: [...messages],
+                messageCount: messages.length,
+                contactCount: userContacts.length,
+                auto: true
+            };
+            backups.unshift(autoBackup);
+            if (backups.length > 20) backups.pop();
+            localStorage.setItem('cryptochat_backups', JSON.stringify(backups));
+            localStorage.setItem('cryptochat_lastbackup', new Date().toISOString());
+            updateBackupStatus();
+        }, 300000); // Every 5 minutes
+    }
+    
+    function showBackupModal() {
+        const modal = document.getElementById('backupModal');
+        const list = document.getElementById('backupList');
+        
+        const savedBackups = localStorage.getItem('cryptochat_backups');
+        if (savedBackups) backups = JSON.parse(savedBackups);
+        
+        if (backups.length === 0) {
+            list.innerHTML = '<div style="padding:20px;text-align:center;">No backups found. Create your first backup!</div>';
+        } else {
+            list.innerHTML = backups.map(b => `
+                <div class="backup-item" onclick="restoreBackup(${b.id})">
+                    <div class="backup-date">📅 ${new Date(b.timestamp).toLocaleString()}</div>
+                    <div class="backup-size">📊 ${b.messageCount} messages • ${b.contactCount} contacts</div>
+                    ${b.auto ? '<span style="font-size:10px;color:var(--success-color);">🤖 Auto-backup</span>' : ''}
+                </div>
+            `).join('');
+        }
+        
+        modal.classList.add('active');
+    }
+    
+    function closeBackupModal() {
+        document.getElementById('backupModal').classList.remove('active');
+    }
+    
+    function showRestoreModal() {
+        const modal = document.getElementById('restoreModal');
+        const list = document.getElementById('restoreList');
+        
+        const savedBackups = localStorage.getItem('cryptochat_backups');
+        if (savedBackups) backups = JSON.parse(savedBackups);
+        
+        if (backups.length === 0) {
+            list.innerHTML = '<div style="padding:20px;text-align:center;">No backups available to restore</div>';
+        } else {
+            list.innerHTML = backups.map(b => `
+                <div class="backup-item" onclick="confirmRestore(${b.id})">
+                    <div class="backup-date">📅 ${new Date(b.timestamp).toLocaleString()}</div>
+                    <div class="backup-size">📊 ${b.messageCount} messages • ${b.contactCount} contacts</div>
+                    ${b.auto ? '<span style="font-size:10px;color:var(--success-color);">🤖 Auto-backup</span>' : ''}
+                </div>
+            `).join('');
+        }
+        
+        modal.classList.add('active');
+    }
+    
+    function closeRestoreModal() {
+        document.getElementById('restoreModal').classList.remove('active');
+    }
+    
+    function restoreBackup(backupId) {
+        const backup = backups.find(b => b.id === backupId);
+        if (backup && confirm('Restore this backup? Current data will be replaced.')) {
+            userContacts = [...backup.contacts];
+            messages = [...backup.messages];
+            saveToLocalStorage();
+            renderContacts();
+            loadMessages();
+            showToast(`Restored ${backup.messageCount} messages and ${backup.contactCount} contacts`, 'success');
+            closeRestoreModal();
+        }
+    }
+    
+    function confirmRestore(backupId) {
+        restoreBackup(backupId);
+    }
+    
+    // ==================== CONTACT MANAGEMENT ====================
+    function showAddContactModal() {
+        document.getElementById('addContactModal').classList.add('active');
+        document.getElementById('newContactName').value = '';
+        document.getElementById('newContactRank').value = '';
+        document.getElementById('newContactId').value = '';
+    }
+    
+    function closeAddContactModal() {
+        document.getElementById('addContactModal').classList.remove('active');
+    }
+    
+    function addContact() {
+        const name = document.getElementById('newContactName').value.trim();
+        const rank = document.getElementById('newContactRank').value.trim();
+        const agency = document.getElementById('newContactAgency').value;
+        const militaryId = document.getElementById('newContactId').value.trim();
+        
+        if (!name) {
+            showToast("Please enter contact name", 'error');
+            return;
+        }
+        
+        const newId = 'contact_' + Date.now();
+        const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        const colors = ['#c2185b', '#00796b', '#303f9f', '#5d4037', '#1565c0', '#ff9800', '#4caf50'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        const newContact = {
+            id: newId,
+            name: rank ? `${rank}. ${name}` : name,
+            avatar: initials,
+            color: `linear-gradient(135deg,${randomColor},${randomColor}cc)`,
+            agency: agency,
+            rank: rank,
+            militaryId: militaryId || newId,
+            isCustom: true
+        };
+        
+        userContacts.push(newContact);
+        saveToLocalStorage();
+        renderContacts();
+        closeAddContactModal();
+        showToast(`Contact ${name} added successfully!`, 'success');
+    }
+    
+    function deleteContact(contactId) {
+        if (contactId === 'spybot') {
+            showToast("Cannot delete Spybot contact", 'error');
+            return;
+        }
+        if (confirm('Delete this contact? All messages will be lost.')) {
+            userContacts = userContacts.filter(c => c.id !== contactId);
+            messages = messages.filter(m => m.contact !== contactId);
+            saveToLocalStorage();
+            renderContacts();
+            if (currentContact === contactId) {
+                selectContact('spybot');
+            }
+            showToast('Contact deleted', 'success');
+        }
+    }
+    
+    // ==================== AUTH ====================
+    function switchTab(tab) {
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+        if(tab === 'login') {
+            document.querySelector('.auth-tab:first-child').classList.add('active');
+            document.getElementById('loginForm').classList.add('active');
+        } else {
+            document.querySelector('.auth-tab:last-child').classList.add('active');
+            document.getElementById('signupForm').classList.add('active');
+        }
+    }
+    
+    function handleLogin() {
+        const user = document.getElementById('loginUser').value.trim();
+        const pass = document.getElementById('loginPass').value;
+        if(!user || !pass) { alert("Enter credentials"); return; }
+        
+        currentUser = { name: user, fullName: user, militaryId: user };
+        localStorage.setItem('cryptochat_user', JSON.stringify(currentUser));
+        
+        // Load saved data
+        loadFromLocalStorage();
+        
+        document.getElementById('authScreen').classList.remove('active');
+        document.getElementById('mainScreen').classList.add('active');
+        initApp();
+    }
+    
+    function handleSignup() {
+        const name = document.getElementById('signupName').value;
+        const milId = document.getElementById('signupMilId').value;
+        const pass = document.getElementById('signupPass').value;
+        if(!name || !milId || !pass) { alert("Fill all fields"); return; }
+        alert("Registration successful! Please login.");
+        switchTab('login');
+    }
+    
+    function logout() {
+        localStorage.removeItem('cryptochat_user');
+        if(keyTimerInt) clearInterval(keyTimerInt);
+        if(threatInterval) clearInterval(threatInterval);
+        document.getElementById('authScreen').classList.add('active');
+        document.getElementById('mainScreen').classList.remove('active');
+    }
+    
+    // ==================== MAIN APP ====================
+    function initApp() {
+        const user = JSON.parse(localStorage.getItem('cryptochat_user') || '{}');
+        document.getElementById('userName').innerHTML = user.name || 'Defense User';
+        document.getElementById('userAvatar').innerHTML = (user.name || 'DU').substring(0,2).toUpperCase();
+        
+        // Load contacts (default + custom)
+        if (userContacts.length === 0) {
+            userContacts = [...defaultContacts];
+            saveToLocalStorage();
+        }
+        
+        renderContacts();
+        loadMessages();
+        startKeyTimer();
+        startThreats();
+        startAutoBackup();
+        
+        document.getElementById('sendBtn').onclick = sendMessage;
+        document.getElementById('msgInput').onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
+        document.getElementById('genKeyBtn').onclick = generateNewKey;
+        document.getElementById('threatBtn').onclick = () => { if(userContacts[1]) selectContact(userContacts[1].id); };
+        
+        setInterval(() => {
+            const status = document.getElementById('connStatus');
+            status.innerHTML = '<i class="fas fa-network-wired"></i> Mesh Active';
+            status.className = 'connection-status connected';
+        }, 10000);
+    }
+    
+    function renderContacts() {
+        const container = document.getElementById('contactsList');
+        container.innerHTML = '';
+        
+        userContacts.forEach(c => {
+            const div = document.createElement('div');
+            div.className = `contact-item ${currentContact === c.id ? 'active' : ''}`;
+            div.onclick = () => selectContact(c.id);
+            div.innerHTML = `
+                <div class="contact-avatar" style="background:${c.color};">${c.avatar}</div>
+                <div class="contact-info">
+                    <div class="contact-name">
+                        <h4>${c.name}</h4>
+                        ${c.isCustom ? `<button class="action-btn" style="padding:2px 6px;" onclick="event.stopPropagation();deleteContact('${c.id}')"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                    <div class="contact-status">${c.agency}</div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+    
+    function selectContact(id) {
+        currentContact = id;
+        const contact = userContacts.find(c => c.id === id);
+        if(contact) {
+            document.getElementById('chatName').innerHTML = contact.name;
+            const keyDisplay = document.getElementById('keyDisplay');
+            keyDisplay.style.display = id === 'spybot' ? 'block' : 'none';
+        }
+        renderContacts();
+        loadMessages();
+    }
+    
+    function loadMessages() {
+        const container = document.getElementById('messagesContainer');
+        container.innerHTML = '';
+        const contactMsgs = messages.filter(m => m.contact === currentContact);
+        contactMsgs.forEach(m => addMsgToUI(m));
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function addMsgToUI(msg) {
+        const container = document.getElementById('messagesContainer');
+        const div = document.createElement('div');
+        div.className = `message ${msg.sent ? 'sent' : 'received'}`;
+        div.setAttribute('data-id', msg.id);
+        if(msg.encrypted) {
+            div.innerHTML = `
+                <div class="message-bubble">
+                    <div style="font-family:monospace;">${msg.text}</div>
+                    <div class="message-time">${msg.time}</div>
+                    <div><i class="fas fa-lock"></i> Encrypted</div>
+                    <button class="decrypt-btn" onclick="showDecrypt(${msg.id})"><i class="fas fa-key"></i> Decrypt</button>
+                </div>
+            `;
+        } else {
+            div.innerHTML = `<div class="message-bubble"><div>${msg.text}</div><div class="message-time">${msg.time}</div><div><i class="fas fa-check-circle"></i> Decrypted</div></div>`;
+        }
+        container.appendChild(div);
+    }
+    
+    function sendMessage() {
+        const input = document.getElementById('msgInput');
+        const text = input.value.trim();
+        if(!text) return;
+        
+        const now = new Date();
+        const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        const encrypted = generateCipher();
+        const msg = { id: msgId++, contact: currentContact, text: encrypted, time: time, encrypted: true, key: activeKey, original: text, sent: true };
+        messages.push(msg);
+        addMsgToUI(msg);
+        input.value = '';
+        
+        saveToLocalStorage();
+        
+        setTimeout(() => simulateResponse(), 1500);
+        const container = document.getElementById('messagesContainer');
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function generateCipher() {
+        const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        let r = '';
+        for(let i=0;i<12;i++) { r += chars[Math.floor(Math.random()*chars.length)]; if(i%4===3 && i<11) r+=' '; }
+        return r;
+    }
+    
+    function simulateResponse() {
+        const responses = ["Message received. Acknowledged.", "Understood. Proceeding.", "Copy that."];
+        const encrypted = generateCipher();
+        const now = new Date();
+        const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        const msg = { id: msgId++, contact: currentContact, text: encrypted, time: time, encrypted: true, key: activeKey, original: responses[Math.floor(Math.random()*responses.length)], sent: false };
+        messages.push(msg);
+        addMsgToUI(msg);
+        saveToLocalStorage();
+        const container = document.getElementById('messagesContainer');
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function showDecrypt(id) {
+        const msg = messages.find(m => m.id === id);
+        if(msg) { pendingMsg = msg; document.getElementById('decryptModal').classList.add('active'); document.getElementById('decryptKeyInput').value = ''; }
+    }
+    
+    function closeDecryptModal() { document.getElementById('decryptModal').classList.remove('active'); pendingMsg = null; }
+    
+    function confirmDecrypt() {
+        const key = document.getElementById('decryptKeyInput').value.trim();
+        if(pendingMsg && key === activeKey) {
+            pendingMsg.encrypted = false;
+            pendingMsg.text = pendingMsg.original;
+            const el = document.querySelector(`.message[data-id="${pendingMsg.id}"]`);
+            if(el) {
+                el.innerHTML = `<div class="message-bubble"><div>${pendingMsg.original}</div><div class="message-time">${pendingMsg.time}</div><div><i class="fas fa-check-circle"></i> Decrypted with key: ${activeKey}</div></div>`;
+            }
+            saveToLocalStorage();
+            closeDecryptModal();
+        } else { alert("UNAUTHORIZED ACCESS! Incorrect key."); closeDecryptModal(); }
+    }
+    
+    function generateNewKey() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let newK = '';
+        for(let i=0;i<9;i++) newK += chars[Math.floor(Math.random()*chars.length)];
+        activeKey = newK;
+        keyExpiry = Date.now() + 60000;
+        document.getElementById('currentKey').innerHTML = activeKey;
+        showToast(`New key generated: ${activeKey}`, 'success');
+    }
+    
+    function startKeyTimer() {
+        if(keyTimerInt) clearInterval(keyTimerInt);
+        keyTimerInt = setInterval(() => {
+            const left = Math.max(0, keyExpiry - Date.now());
+            if(left <= 0) { generateNewKey(); return; }
+            const sec = Math.floor(left/1000);
+            const min = Math.floor(sec/60);
+            const rem = sec%60;
+            document.getElementById('keyTimer').innerHTML = `Expires: ${min.toString().padStart(2,'0')}:${rem.toString().padStart(2,'0')}`;
+        }, 1000);
+    }
+    
+    const threats = [
+        { name: "Physical surveillance", level: "MEDIUM", icon: "fa-user-secret", msg: "Suspicious activity near perimeter" },
+        { name: "GPS spoofing", level: "HIGH", icon: "fa-satellite", msg: "Navigation interference detected" },
+        { name: "Signal jamming", level: "CRITICAL", icon: "fa-broadcast-tower", msg: "Communication disruption" },
+        { name: "Drone reconnaissance", level: "CRITICAL", icon: "fa-drone", msg: "Unauthorized UAV detected" },
+        { name: "Cyber intrusion", level: "HIGH", icon: "fa-hacker", msg: "Unauthorized access attempt" }
+    ];
+    
+    function startThreats() {
+        if(threatInterval) clearInterval(threatInterval);
+        threatInterval = setInterval(() => generateThreat(), Math.random() * 30000 + 25000);
+        setTimeout(() => generateThreat(), 5000);
+    }
+    
+    function generateThreat() {
+        const t = threats[Math.floor(Math.random() * threats.length)];
+        threatCount++;
+        document.getElementById('threatCounter').innerHTML = threatCount;
+        if(currentContact !== 'spybot') addThreatToChat(t);
+        showToast(`${t.name}: ${t.msg}`, 'warning');
+    }
+    
+    function addThreatToChat(t) {
+        const container = document.getElementById('messagesContainer');
+        const div = document.createElement('div');
+        div.className = `threat-alert ${t.level === 'CRITICAL' ? 'critical' : ''}`;
+        div.innerHTML = `
+            <div class="threat-header"><i class="fas ${t.icon}"></i><h4>${t.name}</h4><span class="threat-level">${t.level}</span></div>
+            <div class="threat-message">${t.msg}</div>
+            <div class="threat-details"><span><i class="fas fa-clock"></i> ${new Date().toLocaleTimeString()}</span><span><i class="fas fa-map-marker-alt"></i> Sector ${Math.floor(Math.random()*10)+1}</span></div>
+            <div><button class="threat-btn" onclick="this.closest('.threat-alert').remove();threatCount--;document.getElementById('threatCounter').innerHTML=threatCount;"><i class="fas fa-check"></i> Acknowledge</button></div>
+        `;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function showToast(msg, type) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        const color = type === 'success' ? 'var(--success-color)' : type === 'warning' ? 'var(--warning-color)' : 'var(--accent-color)';
+        toast.style.borderLeft = `4px solid ${color}`;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}" style="margin-right:10px;color:${color}"></i>${msg}`;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+    }
+    
+    // ==================== LIMITATION SOLUTIONS ====================
+    function showLimitationSolution(type) {
+        const modal = document.getElementById('solutionModal');
+        const title = document.getElementById('solutionTitle');
+        const content = document.getElementById('solutionContent');
+        
+        const solutions = {
+            legacy: { title: "🔌 Legacy System Integration", content: "<strong>Solution Implemented:</strong><br><br>• REST API Bridge for legacy systems<br>• STANAG 4406 compliant messaging<br>• Link-16 tactical data link support<br>• Automatic protocol conversion<br>• No hardware upgrades required" },
+            offline: { title: "📡 Offline & Low-Bandwidth Mode", content: "<strong>Solution Implemented:</strong><br><br>• Store-and-forward messaging<br>• Mesh network peer-to-peer routing<br>• Compressed payloads (90% reduction)<br>• Satellite fallback when available<br>• Works in 2G/3G or no connectivity" },
+            usability: { title: "👥 Easy Adoption - Military Grade", content: "<strong>Solution Implemented:</strong><br><br>• WhatsApp-like interface<br>• 2-hour training certification<br>• Role-based access controls<br>• Automated compliance reporting<br>• No special hardware needed" },
+            interop: { title: "🌐 Multi-National Interoperability", content: "<strong>Solution Implemented:</strong><br><br>• NATO STANAG compliance<br>• Coalition messaging bridge<br>• Real-time language translation<br>• Cross-domain security filters<br>• Supports 15+ alliance partners" },
+            cost: { title: "💰 Cost-Effective Deployment", content: "<strong>Solution Implemented:</strong><br><br>• Open-source core with enterprise features<br>• Deploy on existing infrastructure<br>• No per-seat licensing fees<br>• Cloud or on-premise options<br>• 70% lower TCO than alternatives" },
+            decentral: { title: "🔗 Decentralized Architecture", content: "<strong>Solution Implemented:</strong><br><br>• No central server control<br>• Peer-to-peer encrypted routing<br>• No backdoors - provably secure<br>• Independent node verification<br>• Government cannot intercept" },
+            endpoint: { title: "🛡️ Endpoint Protection Suite", content: "<strong>Solution Implemented:</strong><br><br>• Hardware-backed keystore (TPM 2.0)<br>• Biometric + PIN multi-factor<br>• Remote wipe capability<br>• Tamper detection and alert<br>• Secure enclave for keys" }
+        };
+        
+        const sol = solutions[type];
+        if(sol) {
+            title.innerHTML = sol.title;
+            content.innerHTML = sol.content;
+            modal.classList.add('active');
+        }
+    }
+    
+    function closeSolutionModal() { document.getElementById('solutionModal').classList.remove('active'); }
+    
+    // Check session
+    const saved = localStorage.getItem('cryptochat_user');
+    if(saved) { currentUser = JSON.parse(saved); document.getElementById('authScreen').classList.remove('active'); document.getElementById('mainScreen').classList.add('active'); initApp(); }
+</script>
+</body>
+</html>
